@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="ConcurrentProgramming.Model/ConcurrentProgramming.Model.csproj" />
   <Project Path="ConcurrentProgramming.View/ConcurrentProgramming.View.csproj" />
+  <Project Path="ConcurrentProgramming.ViewModel/ConcurrentProgramming.ViewModel.csproj" />
 </Solution>
