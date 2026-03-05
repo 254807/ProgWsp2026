@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="ConcurrentProgramming.Data/ConcurrentProgramming.Data.csproj" Id="8e654586-7316-4a59-a2cc-bc1bbe0af86b" />
+  <Project Path="ConcurrentProgramming.Logic/ConcurrentProgramming.Logic.csproj" Id="55e0a38a-fb91-48a6-aac1-8ac9ca6b2e87" />
   <Project Path="ConcurrentProgramming.Model/ConcurrentProgramming.Model.csproj" />
   <Project Path="ConcurrentProgramming.View/ConcurrentProgramming.View.csproj" />
   <Project Path="ConcurrentProgramming.ViewModel/ConcurrentProgramming.ViewModel.csproj" />
