@@ -7,7 +7,8 @@ namespace ConcurrentProgramming.Data
         public double X
         {
             get;
-            set { 
+            set 
+            { 
                 if (field == value) return;
 
                 field = value;
