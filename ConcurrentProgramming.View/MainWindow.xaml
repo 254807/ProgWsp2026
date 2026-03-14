@@ -8,6 +8,14 @@
         Title="Programowanie współbieżne kulki" Height="450" Width="800"
         ResizeMode="CanMinimize">
     <Canvas x:Name="ball_container">
-        <Ellipse Height="25" Width="25" Fill="Black" Visibility="Hidden" x:Name="ball_template" />
+        <Ellipse 
+            Height="25"
+            Width="25"
+            Fill="Black"
+            Canvas.Left="{Binding Y}"
+            Canvas.Top="{Binding X}"
+            x:Name="ball_template"
+            Visibility="Hidden"
+        />
     </Canvas>
 </Window>
