@@ -6,4 +6,9 @@
 	<LangVersion>14</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ConcurrentProgramming.Logic\ConcurrentProgramming.Logic.csproj" />
+    <ProjectReference Include="..\ConcurrentProgramming.Model\ConcurrentProgramming.Model.csproj" />
+  </ItemGroup>
+
 </Project>
