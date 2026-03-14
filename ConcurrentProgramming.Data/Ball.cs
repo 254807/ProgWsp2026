@@ -1,16 +1,37 @@
-﻿namespace ConcurrentProgramming.Data
-{
-    public class Ball
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
+﻿using System.ComponentModel;
 
-        public Ball(int x, int y)
+namespace ConcurrentProgramming.Data
+{
+    public class Ball : INotifyPropertyChanged
+    {
+        public double X
         {
-            X = x;
-            Y = y;
+            get;
+            set { 
+                if (field == value) return;
+
+                field = value;
+                OnPropertyChanged("X");
+            }
         }
 
-        public Ball() { }
+        public double Y
+        {
+            get;
+            set
+            {
+                if (field == value) return;
+                
+                field = value; 
+                OnPropertyChanged("Y"); 
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
     }
 }
