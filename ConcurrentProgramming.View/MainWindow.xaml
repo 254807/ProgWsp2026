@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="Programowanie współbieżne kulki" Height="450" Width="800"
         ResizeMode="CanMinimize">
-    <Grid>
-    </Grid>
+    <Canvas x:Name="ball_container">
+        <Ellipse Height="25" Width="25" Fill="Black" Visibility="Hidden" x:Name="ball_template" />
+    </Canvas>
 </Window>
