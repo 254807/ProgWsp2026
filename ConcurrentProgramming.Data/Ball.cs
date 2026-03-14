@@ -27,6 +27,12 @@ namespace ConcurrentProgramming.Data
             }
         }
 
+        public Ball(double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged(string name)
