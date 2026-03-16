@@ -4,18 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ConcurrentProgramming.View"
+        xmlns:data="clr-namespace:ConcurrentProgramming.Data;assembly=ConcurrentProgramming.Data"
         mc:Ignorable="d"
         Title="Programowanie współbieżne kulki" Height="450" Width="800"
         ResizeMode="CanMinimize">
-    <Canvas x:Name="ball_container">
+    
+    <Window.Resources>
+        <data:Ball x:Key="BallKey" X="33" Y="45" />
+    </Window.Resources>
+    
+    <Canvas x:Name="BallContainer" DataContext="{StaticResource BallKey}">
         <Ellipse 
             Height="25"
             Width="25"
             Fill="Black"
-            Canvas.Left="{Binding Y}"
             Canvas.Top="{Binding X}"
-            x:Name="ball_template"
-            Visibility="Hidden"
+            Canvas.Left="{Binding Y}"
         />
     </Canvas>
 </Window>

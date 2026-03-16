@@ -4,6 +4,11 @@ namespace ConcurrentProgramming.Data
 {
     public class Ball : INotifyPropertyChanged
     {
+        public Ball()
+        {
+            
+        }
+        
         public double X
         {
             get;
