@@ -1,49 +1,41 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-namespace ConcurrentProgramming.Data
+namespace ConcurrentProgramming.Data;
+
+public sealed class Ball : IBall
 {
-    public class Ball : INotifyPropertyChanged
+    public Ball(Vector position, Vector velocity)
     {
-        public Ball()
-        {
-            
-        }
+        Position = position;
+        Velocity = velocity;
+    }
+
+    public Vector Position
+    {
+        get;
+        set => SetField(ref field, value);
+    }
+
+    public Vector Velocity
+    {
+        get;
+        set => SetField(ref field, value);
+    }
         
-        public double X
-        {
-            get;
-            set 
-            { 
-                if (field == value) return;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-                field = value;
-                OnPropertyChanged("X");
-            }
-        }
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
-        public double Y
-        {
-            get;
-            set
-            {
-                if (field == value) return;
-                
-                field = value; 
-                OnPropertyChanged("Y"); 
-            }
-        }
-
-        public Ball(double x, double y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
     }
 }

@@ -5,21 +5,36 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ConcurrentProgramming.View"
         xmlns:data="clr-namespace:ConcurrentProgramming.Data;assembly=ConcurrentProgramming.Data"
+        xmlns:numerics="clr-namespace:System.Numerics;assembly=System.Numerics.Vectors"
+        xmlns:viewModel="clr-namespace:ConcurrentProgramming.ViewModel;assembly=ConcurrentProgramming.ViewModel"
+        xmlns:logic="clr-namespace:ConcurrentProgramming.Logic;assembly=ConcurrentProgramming.Logic"
         mc:Ignorable="d"
         Title="Programowanie współbieżne kulki" Height="450" Width="800"
         ResizeMode="CanMinimize">
+    <Window.DataContext>
+        <viewModel:MainViewModel />
+    </Window.DataContext>
     
-    <Window.Resources>
-        <data:Ball x:Key="BallKey" X="33" Y="45" />
-    </Window.Resources>
-    
-    <Canvas x:Name="BallContainer" DataContext="{StaticResource BallKey}">
-        <Ellipse 
-            Height="25"
-            Width="25"
-            Fill="Black"
-            Canvas.Top="{Binding X}"
-            Canvas.Left="{Binding Y}"
-        />
-    </Canvas>
+    <ItemsControl ItemsSource="{Binding Balls}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <Canvas />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Ellipse 
+                    Height="25"
+                    Width="25"
+                    Fill="Black"
+                />
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+        <ItemsControl.ItemContainerStyle>
+            <Style TargetType="ContentPresenter">
+                <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                <Setter Property="Canvas.Left" Value="{Binding Left}" />
+            </Style>
+        </ItemsControl.ItemContainerStyle>
+    </ItemsControl>
 </Window>
