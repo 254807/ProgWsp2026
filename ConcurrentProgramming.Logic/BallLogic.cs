@@ -1,9 +1,9 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using ConcurrentProgramming.Data;
-using Vector = ConcurrentProgramming.Data.Vector;
 
 namespace ConcurrentProgramming.Logic;
 
@@ -13,17 +13,20 @@ public sealed class BallLogic : IBallLogic
     
     private readonly object _lock = new(); 
     
-    private readonly Random _random = new Random();
+    private readonly Random _random = new();
     
     public async Task RunMainLoop(CancellationToken cancellationToken)
     {
+        var timestamp = Stopwatch.GetTimestamp();
         while (!cancellationToken.IsCancellationRequested)
         {
+            var elapsed = Stopwatch.GetElapsedTime(timestamp);
+            timestamp = Stopwatch.GetTimestamp();
             lock (_lock)
             {
                 foreach (var ball in Balls)
                 {
-                    ball.Position += ball.Velocity;
+                    ball.Position += ball.Velocity * elapsed.TotalSeconds;
                 }
             }
             
@@ -42,11 +45,11 @@ public sealed class BallLogic : IBallLogic
         }
     }
 
-    private IBall CreateBall()
+    private IBall CreateBall() 
     {
-        var pos = new Vector(_random.NextDouble(), _random.NextDouble()) * 12.0;
-        var velocity = new Vector(_random.NextDouble(), _random.NextDouble());
-        
-        return new Ball(pos, velocity);
+        return new Ball(
+            new Vector(_random.NextDouble(), _random.NextDouble()) * 12.0, 
+            new Vector(_random.NextDouble(), _random.NextDouble()) * 60
+        );
     }
 }

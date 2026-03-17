@@ -17,12 +17,14 @@ public sealed class BallModel : INotifyPropertyChanged
         ball.PropertyChanged += BallOnPropertyChanged;
     }
 
-    public double Left { 
+    public double Left 
+    { 
         get; 
         set => SetField(ref field, value);
     }
     
-    public double Top { 
+    public double Top 
+    { 
         get; 
         set => SetField(ref field, value);
     }

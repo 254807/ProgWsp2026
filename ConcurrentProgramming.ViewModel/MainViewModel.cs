@@ -1,5 +1,4 @@
-﻿using System;
-using ConcurrentProgramming.Data;
+﻿using ConcurrentProgramming.Data;
 using ConcurrentProgramming.Logic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -27,12 +26,11 @@ public sealed class MainViewModel
 
     private void BallsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.Action == NotifyCollectionChangedAction.Add)
+        if (e.Action != NotifyCollectionChangedAction.Add) return;
+        
+        foreach (var newItem in e.NewItems.OfType<IBall>())
         {
-            foreach (var newItem in e.NewItems.OfType<IBall>())
-            {
-                Balls.Add(new BallModel(newItem));
-            }
+            Balls.Add(new BallModel(newItem));
         }
     }
 

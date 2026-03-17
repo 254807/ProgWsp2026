@@ -10,7 +10,7 @@
         xmlns:logic="clr-namespace:ConcurrentProgramming.Logic;assembly=ConcurrentProgramming.Logic"
         mc:Ignorable="d"
         Title="Programowanie współbieżne kulki" Height="450" Width="800"
-        ResizeMode="CanMinimize">
+        ResizeMode="CanResize">
     <Window.DataContext>
         <viewModel:MainViewModel />
     </Window.DataContext>
@@ -26,7 +26,8 @@
                 <Ellipse 
                     Height="25"
                     Width="25"
-                    Fill="Black"
+                    Fill="DarkGray"
+                    Stroke="Black"
                 />
             </DataTemplate>
         </ItemsControl.ItemTemplate>
