@@ -11,7 +11,7 @@ public sealed class BallLogic : IBallLogic
 {
     public ObservableCollection<IBall> Balls { get; } = [];
     
-    private readonly object _lock = new(); 
+    private readonly Lock _lock = new(); 
     
     private readonly Random _random = new();
     
