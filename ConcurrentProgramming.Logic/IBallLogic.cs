@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using System.Threading;
+using System.Drawing;
 using System.Threading.Tasks;
 using ConcurrentProgramming.Data;
 
@@ -9,7 +9,9 @@ public interface IBallLogic
 {
     ObservableCollection<IBall> Balls { get; }
     
-    Task RunMainLoop(CancellationToken cancellationToken);
+    Rectangle Bounds { get; set; }
+    
+    Task RunMainLoop();
     
     void AddBalls(int ballCount);
 }

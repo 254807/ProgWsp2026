@@ -15,27 +15,30 @@
         <viewModel:MainViewModel />
     </Window.DataContext>
     
-    <ItemsControl ItemsSource="{Binding Balls}">
-        <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-                <Canvas />
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <Ellipse 
-                    Height="25"
-                    Width="25"
-                    Fill="DarkGray"
-                    Stroke="Black"
-                />
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-        <ItemsControl.ItemContainerStyle>
-            <Style TargetType="ContentPresenter">
-                <Setter Property="Canvas.Top" Value="{Binding Top}" />
-                <Setter Property="Canvas.Left" Value="{Binding Left}" />
-            </Style>
-        </ItemsControl.ItemContainerStyle>
-    </ItemsControl>
+    <Canvas>
+        <ItemsControl ItemsSource="{Binding Balls}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas>
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Ellipse 
+                        Height="{Binding Diameter}"
+                        Width="{Binding Diameter}"
+                        Fill="DarkGray"
+                        Stroke="Black"
+                    />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                    <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+        </ItemsControl>
+    </Canvas>
 </Window>

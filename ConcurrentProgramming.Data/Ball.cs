@@ -23,7 +23,9 @@ public sealed class Ball : IBall
         get;
         set => SetField(ref field, value);
     }
-        
+
+    public double Radius => 5;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

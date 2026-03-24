@@ -9,11 +9,21 @@ public sealed class BallModel : INotifyPropertyChanged
 {
     private readonly IBall _ball;
 
+    public double Scale
+    {
+        get;
+        set
+        {
+            SetField(ref field, value);
+            BallChanged();
+        }
+    }
+
     public BallModel(IBall ball)
     {
         _ball = ball;
 
-        BallPositionChanged();
+        BallChanged();
         ball.PropertyChanged += BallOnPropertyChanged;
     }
 
@@ -28,24 +38,31 @@ public sealed class BallModel : INotifyPropertyChanged
         get; 
         set => SetField(ref field, value);
     }
+
+    public double Diameter
+    {
+        get;
+        set => SetField(ref field, value);
+    }
     
     public event PropertyChangedEventHandler? PropertyChanged;
     
-    private void BallOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void BallOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
             case nameof(_ball.Position):
-                BallPositionChanged();
+                BallChanged();
                 break;
             
         }
     }
 
-    private void BallPositionChanged()
+    private void BallChanged()
     {
-        Left = _ball.Position.X;
-        Top = _ball.Position.Y;
+        Left = (_ball.Position.X - _ball.Radius) * Scale;
+        Top = (_ball.Position.Y - _ball.Radius) * Scale;
+        Diameter = _ball.Radius * Scale / 2;
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
