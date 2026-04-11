@@ -27,8 +27,14 @@ public sealed class MainViewModel : INotifyPropertyChanged
     /// </summary>
     public ObservableCollection<BallModel> Balls { get; } = [];
 
+    /// <summary>
+    /// Gets the add balls command.
+    /// </summary>
     public ICommand AddBallsCommand { get; }
 
+    /// <summary>
+    /// Gets or sets the balls to be added.
+    /// </summary>
     public int BallsToAdd
     {
         get;
@@ -46,6 +52,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
         AddBallsCommand = new DelegateCommand(ExecuteAddBallsCommand, _ => BallLogic.Balls.Count == 0);
     }
 
+    /// <summary>
+    /// Executes the add balls command.
+    /// </summary>
+    /// <param name="parameter">The parameter.</param>
     private void ExecuteAddBallsCommand(object? parameter)
     {
         AddBalls(BallsToAdd);
@@ -78,11 +88,22 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Ons the property changed.
+    /// </summary>
+    /// <param name="propertyName">The property name</param>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    /// <summary>
+    /// Sets the field.
+    /// </summary>
+    /// <param name="field">The field</param>
+    /// <param name="value">The value</param>
+    /// <param name="propertyName">The property name</param>
+    /// <returns>A bool.</returns>
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
