@@ -18,8 +18,8 @@ public sealed class MainViewModel
     public MainViewModel()
     {
         BallLogic = new BallLogic();
-        BallLogic.Balls.CollectionChanged += BallsOnCollectionChanged;
-        
+        ((INotifyCollectionChanged)BallLogic.Balls).CollectionChanged += BallsOnCollectionChanged;  // TOTAL .NET INSANITY
+
         AddBalls(12);
 
         BallLogic.RunMainLoop();
