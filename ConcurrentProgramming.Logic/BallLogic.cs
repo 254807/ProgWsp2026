@@ -12,8 +12,7 @@ namespace ConcurrentProgramming.Logic;
 /// </summary>
 public sealed class BallLogic : IBallLogic
 {
-    private readonly ObservableCollection<IBall> _balls;
-    private readonly ReadOnlyObservableCollection<IBall> _read_only_balls;
+    private readonly ObservableCollection<IBall> _balls = [];
 
     private readonly Random _random = new();
 
@@ -22,12 +21,11 @@ public sealed class BallLogic : IBallLogic
     /// </summary>
     public BallLogic()
     {
-        _balls = [];
-        _read_only_balls = new(_balls);
+        Balls = new(_balls);
     }
 
     /// <inheritdoc />
-    public ReadOnlyObservableCollection<IBall> Balls => _read_only_balls;
+    public ReadOnlyObservableCollection<IBall> Balls { get; }
     
     /// <inheritdoc />
     public void AddBalls(int ballCount)
