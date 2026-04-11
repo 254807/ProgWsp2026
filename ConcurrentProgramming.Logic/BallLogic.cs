@@ -7,14 +7,20 @@ using ConcurrentProgramming.Data;
 
 namespace ConcurrentProgramming.Logic;
 
+/// <summary>
+/// Standard ball logic.
+/// </summary>
 public sealed class BallLogic : IBallLogic
 {
+    /// <inheritdoc />
     public ObservableCollection<IBall> Balls { get; } = [];
 
+    /// <inheritdoc />
     public Rectangle Bounds { get; set; } = new Rectangle(0, 0, 1920 / 6, 1080 / 6);
     
     private readonly Random _random = new();
     
+    /// <inheritdoc />
     public async Task RunMainLoop()
     {
         var timestamp = Stopwatch.GetTimestamp();
@@ -33,6 +39,11 @@ public sealed class BallLogic : IBallLogic
         }
     }
 
+    /// <summary>
+    /// Moves the ball.
+    /// </summary>
+    /// <param name="ball">The ball to be moved</param>
+    /// <param name="elapsed">The elapsed time from last move</param>
     private void MoveBall(IBall ball, TimeSpan elapsed)
     {
         var newPosition = ball.Position + ball.Velocity * elapsed.TotalSeconds;
@@ -52,6 +63,7 @@ public sealed class BallLogic : IBallLogic
         ball.Position = newPosition;
     }
 
+    /// <inheritdoc />
     public void AddBalls(int ballCount)
     {
         for (var i = 0; i < ballCount; i++)
@@ -60,7 +72,11 @@ public sealed class BallLogic : IBallLogic
         }
     }
 
-    private IBall CreateBall()
+    /// <summary>
+    /// Creates a new initialisatied standard ball.
+    /// </summary>
+    /// <returns>A newly created Ball</returns>
+    private Ball CreateBall()
     {
         var velocity = new Vector(_random.NextDouble() - 0.5, _random.NextDouble() -0.5) * 60;
         velocity.X += 1 * double.Sign(velocity.X);
