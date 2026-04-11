@@ -92,9 +92,16 @@ public sealed class BallLogic : IBallLogic
         velocity.X += 1 * double.Sign(velocity.X);
         velocity.Y += 1 * double.Sign(velocity.Y);
         
-        return new Ball(
+        var ball = new Ball(
             new Vector(_random.NextDouble() * Bounds.Width, _random.NextDouble() * Bounds.Height),
             velocity
         );
+
+        ball.Position = new Vector(
+            double.Clamp(ball.Position.X, ball.Radius, Bounds.Width - ball.Radius),
+            double.Clamp(ball.Position.Y, ball.Radius, Bounds.Height - ball.Radius)
+        );
+
+        return ball;
     }
 }
