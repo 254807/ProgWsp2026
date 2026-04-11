@@ -21,7 +21,7 @@ public interface IBallLogic
     Rectangle Bounds { get; set; }
 
     /// <summary>
-    /// Runs the ball moving loop asynchronously.
+    /// Runs the ball moving loop asynchronously infinitely.
     /// </summary>
     /// <returns>A Task that runs the loop</returns>
     Task RunMainLoop();
