@@ -9,16 +9,6 @@ public sealed class BallModel : INotifyPropertyChanged
 {
     private readonly IBall _ball;
 
-    public double Scale
-    {
-        get;
-        set
-        {
-            SetField(ref field, value);
-            BallChanged();
-        }
-    }
-
     public BallModel(IBall ball)
     {
         _ball = ball;
@@ -60,9 +50,9 @@ public sealed class BallModel : INotifyPropertyChanged
 
     private void BallChanged()
     {
-        Left = (_ball.Position.X - _ball.Radius) * Scale;
-        Top = (_ball.Position.Y - _ball.Radius) * Scale;
-        Diameter = _ball.Radius * Scale / 2;
+        Left = _ball.Position.X - _ball.Radius;
+        Top = _ball.Position.Y - _ball.Radius;
+        Diameter = _ball.Radius * 2;
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

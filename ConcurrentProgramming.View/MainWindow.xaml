@@ -3,11 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ConcurrentProgramming.View"
-        xmlns:data="clr-namespace:ConcurrentProgramming.Data;assembly=ConcurrentProgramming.Data"
-        xmlns:numerics="clr-namespace:System.Numerics;assembly=System.Numerics.Vectors"
         xmlns:viewModel="clr-namespace:ConcurrentProgramming.ViewModel;assembly=ConcurrentProgramming.ViewModel"
-        xmlns:logic="clr-namespace:ConcurrentProgramming.Logic;assembly=ConcurrentProgramming.Logic"
         mc:Ignorable="d"
         Title="Programowanie współbieżne kulki" Height="450" Width="800"
         ResizeMode="CanResize">
@@ -15,30 +11,56 @@
         <viewModel:MainViewModel />
     </Window.DataContext>
     
-    <Canvas>
-        <ItemsControl ItemsSource="{Binding Balls}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas>
-                    </Canvas>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Ellipse 
-                        Height="{Binding Diameter}"
-                        Width="{Binding Diameter}"
-                        Fill="DarkGray"
-                        Stroke="Black"
-                    />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-            <ItemsControl.ItemContainerStyle>
-                <Style TargetType="ContentPresenter">
-                    <Setter Property="Canvas.Top" Value="{Binding Top}" />
-                    <Setter Property="Canvas.Left" Value="{Binding Left}" />
-                </Style>
-            </ItemsControl.ItemContainerStyle>
-        </ItemsControl>
-    </Canvas>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        
+        <StackPanel Grid.Column="0">
+            <DockPanel>
+                <Label VerticalContentAlignment="Center">Ilość kulek</Label>
+                <TextBox VerticalContentAlignment="Center"
+                         Text="{Binding BallsToAdd}"/>
+            </DockPanel>
+            
+            <Button Command="{Binding AddBallsCommand}">Dodaj kulki</Button>
+        </StackPanel>
+        
+        <Viewbox Grid.Column="1" Stretch="Uniform">
+            <Canvas Width="{Binding BallLogic.Bounds.Width}" Height="{Binding BallLogic.Bounds.Height}">
+                <Rectangle
+                    Width="{Binding BallLogic.Bounds.Width}"
+                    Height="{Binding BallLogic.Bounds.Height}"
+                    Fill="LightGray"
+                    Stroke="Black" >
+                </Rectangle>
+                
+                <ItemsControl ItemsSource="{Binding Balls}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas>
+                            </Canvas>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Ellipse 
+                                Height="{Binding Diameter}"
+                                Width="{Binding Diameter}"
+                                Fill="DarkGray"
+                                Stroke="Black"
+                            />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                            <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+            </Canvas>
+        </Viewbox>
+    </Grid>
 </Window>
