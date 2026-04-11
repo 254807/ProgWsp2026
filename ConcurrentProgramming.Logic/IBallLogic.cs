@@ -13,7 +13,7 @@ public interface IBallLogic
     /// <summary>
     /// Gets the balls.
     /// </summary>
-    ObservableCollection<IBall> Balls { get; }
+    ReadOnlyObservableCollection<IBall> Balls { get; }
 
     /// <summary>
     /// Gets or sets the bounds.

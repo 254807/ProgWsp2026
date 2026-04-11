@@ -12,13 +12,34 @@ namespace ConcurrentProgramming.Logic;
 /// </summary>
 public sealed class BallLogic : IBallLogic
 {
+    private readonly ObservableCollection<IBall> _balls;
+    private readonly ReadOnlyObservableCollection<IBall> _read_only_balls;
+
+    private readonly Random _random = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BallLogic"/> class.
+    /// </summary>
+    public BallLogic()
+    {
+        _balls = [];
+        _read_only_balls = new(_balls);
+    }
+
     /// <inheritdoc />
-    public ObservableCollection<IBall> Balls { get; } = [];
+    public ReadOnlyObservableCollection<IBall> Balls => _read_only_balls;
+    
+    /// <inheritdoc />
+    public void AddBalls(int ballCount)
+    {
+        for (var i = 0; i < ballCount; i++)
+        {
+            _balls.Add(CreateBall());
+        }
+    }
 
     /// <inheritdoc />
     public Rectangle Bounds { get; set; } = new Rectangle(0, 0, 1920 / 6, 1080 / 6);
-    
-    private readonly Random _random = new();
     
     /// <inheritdoc />
     public async Task RunMainLoop()
@@ -30,7 +51,7 @@ public sealed class BallLogic : IBallLogic
             var elapsed = Stopwatch.GetElapsedTime(timestamp);
             timestamp = Stopwatch.GetTimestamp();
             
-            foreach (var ball in Balls)
+            foreach (var ball in _balls)
             {
                 MoveBall(ball, elapsed);
             }
@@ -61,15 +82,6 @@ public sealed class BallLogic : IBallLogic
         }
         
         ball.Position = newPosition;
-    }
-
-    /// <inheritdoc />
-    public void AddBalls(int ballCount)
-    {
-        for (var i = 0; i < ballCount; i++)
-        {
-            Balls.Add(CreateBall());
-        }
     }
 
     /// <summary>
