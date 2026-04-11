@@ -40,10 +40,10 @@ public sealed class Ball : IBall
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
-    /// Property changed event handler.
+    /// Fires property changed event.
     /// </summary>
     /// <param name="propertyName">Name of changed property</param>
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void FirePropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -59,7 +59,7 @@ public sealed class Ball : IBall
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
         field = value;
-        OnPropertyChanged(propertyName);
+        FirePropertyChanged(propertyName);
         return true;
     }
 }
