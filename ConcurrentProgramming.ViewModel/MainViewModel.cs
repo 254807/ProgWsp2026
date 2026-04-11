@@ -12,12 +12,21 @@ using ConcurrentProgramming.Model;
 
 namespace ConcurrentProgramming.ViewModel;
 
+/// <summary>
+/// The main view model.
+/// </summary>
 public sealed class MainViewModel : INotifyPropertyChanged
 {
+    /// <summary>
+    /// Gets the ball logic.
+    /// </summary>
     public IBallLogic BallLogic { get; }
 
+    /// <summary>
+    /// Gets the balls.
+    /// </summary>
     public ObservableCollection<BallModel> Balls { get; } = [];
-    
+
     public ICommand AddBallsCommand { get; }
 
     public int BallsToAdd
@@ -26,6 +35,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
         set => SetField(ref field, value);
     } = 0;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+    /// </summary>
     public MainViewModel()
     {
         BallLogic = new BallLogic();
@@ -40,6 +52,11 @@ public sealed class MainViewModel : INotifyPropertyChanged
         BallLogic.RunMainLoop();
     }
 
+    /// <summary>
+    /// Balls the on collection changed.
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The e.</param>
     private void BallsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action != NotifyCollectionChangedAction.Add) return;
@@ -50,6 +67,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Adds the balls.
+    /// </summary>
+    /// <param name="count">The count.</param>
     public void AddBalls(int count)
     {
         BallLogic.AddBalls(count);
