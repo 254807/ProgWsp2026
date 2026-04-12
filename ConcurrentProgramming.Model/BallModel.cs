@@ -6,7 +6,7 @@ using ConcurrentProgramming.Data;
 namespace ConcurrentProgramming.Model;
 
 /// <summary>
-/// The ball model.
+/// Iball decorator/wrapper that auto-scales to window size.
 /// </summary>
 public sealed class BallModel : INotifyPropertyChanged
 {
@@ -15,7 +15,7 @@ public sealed class BallModel : INotifyPropertyChanged
     /// <summary>
     /// Initializes a new instance of the <see cref="BallModel"/> class.
     /// </summary>
-    /// <param name="ball">The ball</param>
+    /// <param name="ball">The Iball instance</param>
     public BallModel(IBall ball)
     {
         _ball = ball;
@@ -35,7 +35,7 @@ public sealed class BallModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Gets or sets the left side.
+    /// Gets or sets the distance from the window's left border.
     /// </summary>
     public double Left 
     { 
@@ -44,7 +44,7 @@ public sealed class BallModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Gets or sets the top.
+    /// Gets or sets the distance from the window's top border.
     /// </summary>
     public double Top 
     { 
@@ -53,7 +53,7 @@ public sealed class BallModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Gets or sets the diameter.
+    /// Gets or sets the ball's diameter.
     /// </summary>
     public double Diameter
     {
@@ -61,10 +61,11 @@ public sealed class BallModel : INotifyPropertyChanged
         set => SetField(ref field, value);
     }
     
+    /// <inheritdoc />
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
-    /// Balls the changed.
+    /// To be called when IBall fired <see langword='PropertyChanged'/> .
     /// </summary>
     private void BallChanged()
     {
@@ -74,21 +75,21 @@ public sealed class BallModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Ons the property changed.
+    /// Fires property changed event.
     /// </summary>
-    /// <param name="propertyName">The property name.</param>
+    /// <param name="propertyName">Name of changed property</param>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>
-    /// Sets the field.
+    /// Sets field.
     /// </summary>
-    /// <param name="field">The field.</param>
-    /// <param name="value">The value.</param>
-    /// <param name="propertyName">The property name.</param>
-    /// <returns>A bool.</returns>
+    /// <param name="field">Field reference</param>
+    /// <param name="value">New value</param>
+    /// <param name="propertyName">Property name</param>
+    /// <returns>True if change accually occured, false otherwise</returns>
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ConcurrentProgramming.Data;
 using ConcurrentProgramming.Logic;
 using System.Collections.ObjectModel;
@@ -13,7 +12,7 @@ using ConcurrentProgramming.Model;
 namespace ConcurrentProgramming.ViewModel;
 
 /// <summary>
-/// The main view model.
+/// The main view handler class.
 /// </summary>
 public sealed class MainViewModel : INotifyPropertyChanged
 {
@@ -23,17 +22,17 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public IBallLogic BallLogic { get; }
 
     /// <summary>
-    /// Gets the balls.
+    /// Gets the balls collection.
     /// </summary>
     public ObservableCollection<BallModel> Balls { get; } = [];
 
     /// <summary>
-    /// Gets the add balls command.
+    /// Gets the command that adds new balls.
     /// </summary>
     public ICommand AddBallsCommand { get; }
 
     /// <summary>
-    /// Gets or sets the balls to be added.
+    /// Gets or sets the balls to be added when <see cref="ExecuteAddBallsCommand"/> is called.
     /// </summary>
     public int BallsToAdd
     {
@@ -47,63 +46,58 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public MainViewModel()
     {
         BallLogic = new BallLogic();
-        ((INotifyCollectionChanged)BallLogic.Balls).CollectionChanged += BallsOnCollectionChanged;  // TOTAL .NET INSANITY
+
+        // TOTAL .NET INSANITY
+        ((INotifyCollectionChanged)BallLogic.Balls).CollectionChanged += (sender, e) =>
+        {
+            if (e.Action != NotifyCollectionChangedAction.Add) return;
+
+            foreach (var newItem in e.NewItems?.OfType<IBall>() ?? [])
+            {
+                Balls.Add(new BallModel(newItem));
+            }
+        };  
 
         AddBallsCommand = new DelegateCommand(ExecuteAddBallsCommand, _ => BallLogic.Balls.Count == 0);
     }
 
     /// <summary>
-    /// Executes the add balls command.
+    /// Handles adding balls and runs main loop.
     /// </summary>
-    /// <param name="parameter">The parameter.</param>
-    private void ExecuteAddBallsCommand(object? parameter)
+    private void ExecuteAddBallsCommand(object? _)
     {
         AddBalls(BallsToAdd);
         BallLogic.RunMainLoop();
     }
 
     /// <summary>
-    /// Balls the on collection changed.
+    /// Adds given number of balls.
     /// </summary>
-    /// <param name="sender">The sender.</param>
-    /// <param name="e">The e.</param>
-    private void BallsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (e.Action != NotifyCollectionChangedAction.Add) return;
-        
-        foreach (var newItem in e.NewItems?.OfType<IBall>() ?? [])
-        {
-            Balls.Add(new BallModel(newItem));
-        }
-    }
-
-    /// <summary>
-    /// Adds the balls.
-    /// </summary>
-    /// <param name="count">The count.</param>
+    /// <param name="count">Ammount of balls to be added</param>
     public void AddBalls(int count)
     {
         BallLogic.AddBalls(count);
     }
 
+    /// <inheritdoc />
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
-    /// Ons the property changed.
+    /// Fires property changed event.
     /// </summary>
-    /// <param name="propertyName">The property name</param>
+    /// <param name="propertyName">Name of changed property</param>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>
-    /// Sets the field.
+    /// Sets field.
     /// </summary>
-    /// <param name="field">The field</param>
-    /// <param name="value">The value</param>
-    /// <param name="propertyName">The property name</param>
-    /// <returns>A bool.</returns>
+    /// <param name="field">Field reference</param>
+    /// <param name="value">New value</param>
+    /// <param name="propertyName">Property name</param>
+    /// <returns>True if change accually occured, false otherwise</returns>
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
