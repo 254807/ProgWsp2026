@@ -4,6 +4,7 @@ using ConcurrentProgramming.Logic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -40,14 +41,21 @@ public sealed class MainViewModel : INotifyPropertyChanged
         set => SetField(ref field, value);
     } = 0;
 
+    public Rectangle Bounds
+    {
+        get;
+        private set => SetField(ref field, value);
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="MainViewModel"/> class.
     /// </summary>
     public MainViewModel()
     {
         BallLogic = new BallLogic();
+        BallLogic.PropertyChanged += (_, _) => Bounds = BallLogic.Bounds;
+        Bounds = BallLogic.Bounds;
 
-        // TOTAL .NET INSANITY
         ((INotifyCollectionChanged)BallLogic.Balls).CollectionChanged += (sender, e) =>
         {
             if (e.Action != NotifyCollectionChangedAction.Add) return;

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Threading.Tasks;
 using ConcurrentProgramming.Data;
@@ -8,7 +9,7 @@ namespace ConcurrentProgramming.Logic;
 /// <summary>
 /// Ball logic.
 /// </summary>
-public interface IBallLogic
+public interface IBallLogic : INotifyPropertyChanged
 {
     /// <summary>
     /// Gets the balls.

@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using ConcurrentProgramming.Data;
 
@@ -37,8 +40,12 @@ public sealed class BallLogic : IBallLogic
     }
 
     /// <inheritdoc />
-    public Rectangle Bounds { get; set; } = new Rectangle(0, 0, 1920 / 6, 1080 / 6);
-    
+    public Rectangle Bounds
+    {
+        get;
+        set => SetField(ref field, value);
+    } = new Rectangle(0, 0, 1920 / 6, 1080 / 6);
+
     /// <inheritdoc />
     public async Task RunMainLoop()
     {
@@ -103,5 +110,20 @@ public sealed class BallLogic : IBallLogic
         );
 
         return ball;
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
     }
 }

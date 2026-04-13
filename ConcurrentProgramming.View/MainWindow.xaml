@@ -28,10 +28,10 @@
         </StackPanel>
         
         <Viewbox Grid.Column="1" Stretch="Uniform">
-            <Canvas Width="{Binding BallLogic.Bounds.Width}" Height="{Binding BallLogic.Bounds.Height}">
+            <Canvas Width="{Binding Bounds.Width}" Height="{Binding Bounds.Height}">
                 <Rectangle
-                    Width="{Binding BallLogic.Bounds.Width}"
-                    Height="{Binding BallLogic.Bounds.Height}"
+                    Width="{Binding Bounds.Width}"
+                    Height="{Binding Bounds.Height}"
                     Fill="LightGray"
                     Stroke="Black" >
                 </Rectangle>
