@@ -35,7 +35,9 @@ public sealed class BallLogic : IBallLogic
     {
         for (var i = 0; i < ballCount; i++)
         {
-            _balls.Add(CreateBall());
+            var ball = CreateBall();
+            _balls.Add(ball);
+            ball.PropertyChanged += BallOnPropertyChanged;
         }
     }
 
@@ -58,46 +60,52 @@ public sealed class BallLogic : IBallLogic
             
             foreach (var ball in _balls)
             {
-                MoveBall(ball, elapsed);
+                ball.Move(elapsed);
             }
             
             await Task.Delay(TimeSpan.FromSeconds(1.0 / 60.0));
         }
     }
-
-    /// <summary>
-    /// Moves the ball.
-    /// </summary>
-    /// <param name="ball">The ball to be moved</param>
-    /// <param name="elapsed">The elapsed time from last move</param>
-    private void MoveBall(IBall ball, TimeSpan elapsed)
+    
+    private void BallOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var newPosition = ball.Position + ball.Velocity * elapsed.TotalSeconds;
-
-        if (newPosition.Y + ball.Radius > Bounds.Bottom || newPosition.Y - ball.Radius < Bounds.Top)
+        if (sender is not IBall ball || e.PropertyName != nameof(IBall.Position)) return;
+        
+        var newPosition = ball.Position;
+        if (newPosition.Y + ball.Radius > Bounds.Bottom)
         {
             ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
-            return;
+            ball.Position = ball.Position with { Y = Bounds.Bottom - ball.Radius };
+        }
+        else if (newPosition.Y - ball.Radius < Bounds.Top)
+        {
+            ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
+            ball.Position = ball.Position with { Y = Bounds.Top + ball.Radius };
         }
         
-        if (newPosition.X - ball.Radius < Bounds.Left || newPosition.X + ball.Radius > Bounds.Right)
+        if (newPosition.X + ball.Radius > Bounds.Right)
         {
             ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
-            return;
+            ball.Position = ball.Position with { X = Bounds.Right - ball.Radius };
         }
         
-        ball.Position = newPosition;
+        // ReSharper disable once InvertIf
+        else if (newPosition.X - ball.Radius < Bounds.Left)
+        {
+            ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
+            ball.Position = ball.Position with { X = Bounds.Left + ball.Radius };
+        }
     }
 
     /// <summary>
-    /// Creates a new initialisatied standard ball.
+    /// Creates a new initialized standard ball.
     /// </summary>
     /// <returns>A newly created Ball</returns>
     private Ball CreateBall()
     {
-        var velocity = new Vector(_random.NextDouble() - 0.5, _random.NextDouble() -0.5) * 60;
-        velocity.X += 1 * double.Sign(velocity.X);
-        velocity.Y += 1 * double.Sign(velocity.Y);
+        var velocity = new Vector(_random.NextDouble() - 0.5, _random.NextDouble() -0.5) * 90;
+        velocity.X += double.Sign(velocity.X);
+        velocity.Y += double.Sign(velocity.Y);
         
         var ball = new Ball(
             new Vector(_random.NextDouble() * Bounds.Width, _random.NextDouble() * Bounds.Height),

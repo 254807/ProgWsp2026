@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -36,6 +37,15 @@ public sealed class Ball : IBall
 
     /// <inheritdoc/>
     public double Radius => 5;
+
+    /// <inheritdoc/>
+    public double Weight => Radius * 2;
+
+    /// <inheritdoc/>
+    public void Move(TimeSpan elapsed)
+    {
+        Position += Velocity * elapsed.TotalSeconds;
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
