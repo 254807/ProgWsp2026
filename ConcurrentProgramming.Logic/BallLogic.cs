@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using ConcurrentProgramming.Data;
 
 namespace ConcurrentProgramming.Logic;
@@ -38,9 +39,12 @@ public sealed class BallLogic : IBallLogic
     public void AddBall(CancellationToken cancellationToken)
     {
         var ball = CreateBall();
-        _balls.Add(ball);
+        lock (_lock)
+        {
+            _balls.Add(ball);
+        }
         ball.PropertyChanged += BallOnPropertyChanged;
-        _ = ball.Move(cancellationToken);
+        _ = Task.Run(() => ball.Move(cancellationToken), cancellationToken);
     }
     
     /// <inheritdoc />
