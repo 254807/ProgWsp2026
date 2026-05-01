@@ -1,5 +1,6 @@
-using System;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ConcurrentProgramming.Data;
 
@@ -24,13 +25,13 @@ public interface IBall : INotifyPropertyChanged
     double Radius { get; }
     
     /// <summary>
-    /// Gets the ball's weight.
+    /// Gets the ball's mass.
     /// </summary>
-    double Weight { get; }
+    double Mass { get; }
 
     /// <summary>
     /// Moves the ball.
     /// </summary>
-    /// <param name="elapsed">Time elapsed since last frame.</param>
-    void Move(TimeSpan elapsed);
+    /// <param name="cancellationToken">Cancellation token which can be used to cancel the movement thread.</param>
+    Task Move(CancellationToken cancellationToken);
 }

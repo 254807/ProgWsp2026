@@ -5,6 +5,22 @@ namespace ConcurrentProgramming.Data;
 /// </summary>
 public record struct Vector(double X, double Y)
 {
+    public double LengthSquared()
+    {
+        return X * X + Y * Y;
+    }
+    
+    public double Length() => double.Sqrt(LengthSquared());
+
+    public Vector Normalized()
+    {
+        var length = Length();
+        if (length == 0)
+            return default;
+        
+        return new Vector(X / length, Y / length);
+    }
+    
     /// <summary>
     /// Adds two vectors together.
     /// </summary>
@@ -28,4 +44,19 @@ public record struct Vector(double X, double Y)
     /// <param name="b">The scalar multiplier</param>
     /// <returns>A new <see cref="Vector"/> where each component is multiplied by <paramref name="b"/></returns>
     public static Vector operator*(Vector a, double b) => new(a.X * b, a.Y * b);
+    
+    public static double Distance(Vector value1, Vector value2)
+    {
+        return double.Sqrt(DistanceSquared(value1, value2));
+    }
+    
+    public static double DistanceSquared(Vector value1, Vector value2)
+    {
+        return (value1 - value2).LengthSquared();
+    }
+
+    public static double Dot(Vector value1, Vector value2)
+    {
+        return value1.X * value2.X + value1.Y * value2.Y;
+    }
 }

@@ -56,7 +56,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         BallLogic.PropertyChanged += (_, _) => Bounds = BallLogic.Bounds;
         Bounds = BallLogic.Bounds;
 
-        ((INotifyCollectionChanged)BallLogic.Balls).CollectionChanged += (sender, e) =>
+        ((INotifyCollectionChanged)BallLogic.Balls).CollectionChanged += (_, e) =>
         {
             if (e.Action != NotifyCollectionChangedAction.Add) return;
 
@@ -75,7 +75,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private void ExecuteAddBallsCommand(object? _)
     {
         AddBalls(BallsToAdd);
-        BallLogic.RunMainLoop();
     }
 
     /// <summary>

@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.Threading.Tasks;
+using System.Threading;
 using ConcurrentProgramming.Data;
 
 namespace ConcurrentProgramming.Logic;
@@ -19,17 +20,17 @@ public interface IBallLogic : INotifyPropertyChanged
     /// <summary>
     /// Gets or sets the bounds.
     /// </summary>
-    Rectangle Bounds { get; set; }
+    Rectangle Bounds { get; init; }
 
     /// <summary>
-    /// Runs the ball moving loop asynchronously infinitely.
+    /// Adds a ball.
     /// </summary>
-    /// <returns>A Task that runs the loop</returns>
-    Task RunMainLoop();
-
+    /// <param name="cancellationToken">Token which cancels the movement of the new ball.</param>
+    void AddBall(CancellationToken cancellationToken);
+    
     /// <summary>
     /// Adds given number of balls.
     /// </summary>
     /// <param name="ballCount">The ball count.</param>
-    void AddBalls(int ballCount);
+    IReadOnlyList<CancellationTokenSource> AddBalls(int ballCount);
 }

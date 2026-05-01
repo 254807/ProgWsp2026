@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+using System.Threading;
 using ConcurrentProgramming.Data;
+using Vector = ConcurrentProgramming.Data.Vector;
 
 namespace ConcurrentProgramming.Logic;
 
@@ -19,53 +19,51 @@ public sealed class BallLogic : IBallLogic
 
     private readonly Random _random = new();
 
+    private readonly Lock _lock = new();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="BallLogic"/> class.
     /// </summary>
     public BallLogic()
     {
-        Balls = new(_balls);
+        Balls = new ReadOnlyObservableCollection<IBall>(_balls);
     }
 
     /// <inheritdoc />
     public ReadOnlyObservableCollection<IBall> Balls { get; }
+
+    public void AddBall(CancellationToken cancellationToken)
+    {
+        var ball = CreateBall();
+        _balls.Add(ball);
+        ball.PropertyChanged += BallOnPropertyChanged;
+        _ = ball.Move(cancellationToken);
+    }
     
     /// <inheritdoc />
-    public void AddBalls(int ballCount)
+    public IReadOnlyList<CancellationTokenSource> AddBalls(int ballCount)
     {
+        List<CancellationTokenSource> tokenSources = [];
+        
         for (var i = 0; i < ballCount; i++)
         {
-            var ball = CreateBall();
-            _balls.Add(ball);
-            ball.PropertyChanged += BallOnPropertyChanged;
+            CancellationTokenSource source = new();
+            
+            tokenSources.Add(source);
+            AddBall(source.Token);
         }
+
+        return tokenSources;
     }
 
     /// <inheritdoc />
     public Rectangle Bounds
     {
         get;
-        set => SetField(ref field, value);
-    } = new Rectangle(0, 0, 1920 / 6, 1080 / 6);
+        init => SetField(ref field, value);
+    } = new(0, 0, 1920 / 6, 1080 / 6);
 
-    /// <inheritdoc />
-    public async Task RunMainLoop()
-    {
-        var timestamp = Stopwatch.GetTimestamp();
-        
-        while (true)
-        {
-            var elapsed = Stopwatch.GetElapsedTime(timestamp);
-            timestamp = Stopwatch.GetTimestamp();
-            
-            foreach (var ball in _balls)
-            {
-                ball.Move(elapsed);
-            }
-            
-            await Task.Delay(TimeSpan.FromSeconds(1.0 / 60.0));
-        }
-    }
+    private IBall? _currentlyCheckedBall;
     
     private void BallOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -95,6 +93,43 @@ public sealed class BallLogic : IBallLogic
             ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
             ball.Position = ball.Position with { X = Bounds.Left + ball.Radius };
         }
+
+        lock (_lock)
+        {
+            // Hackfix to avoid infinite recursion when setting the position after colliding
+            // TODO: find a better way to do this
+            if (_currentlyCheckedBall == ball)
+                return;
+            _currentlyCheckedBall = ball;
+            
+            foreach (var otherBall in Balls)
+            {
+                if (otherBall == ball)
+                    continue;
+                
+                var position = ball.Position;
+                var otherPosition = otherBall.Position;
+                
+                var dist = Vector.Distance(position, otherPosition);
+                if (dist >= ball.Radius + otherBall.Radius)
+                    continue;
+
+                // First, move the ball to the exact collision point, to avoid balls getting stuck inside each other
+                ball.Position = otherPosition - (otherPosition - position).Normalized() * (ball.Radius + otherBall.Radius);
+                //otherBall.Position = position - (position - otherPosition).Normalized() * (ball.Radius + otherBall.Radius);
+
+                (ball.Velocity, otherBall.Velocity) = (ElasticCollision(ball, otherBall), ElasticCollision(otherBall, ball));
+            }
+        }
+    }
+
+    private static Vector ElasticCollision(IBall ball, IBall otherBall)
+    {
+        // https://en.wikipedia.org/wiki/Elastic_collision
+        // "In an angle-free representation, the changed velocities are computed using the centers x1 and x2 at the time of contact as:"
+        return ball.Velocity - (ball.Position - otherBall.Position)
+            * (2 * otherBall.Mass / (ball.Mass + otherBall.Mass))
+            * (Vector.Dot(ball.Velocity - otherBall.Velocity, ball.Position - otherBall.Position) / Vector.DistanceSquared(ball.Position, otherBall.Position));
     }
 
     /// <summary>

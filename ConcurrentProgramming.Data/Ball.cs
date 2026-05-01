@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ConcurrentProgramming.Data;
 
@@ -39,12 +42,22 @@ public sealed class Ball : IBall
     public double Radius => 5;
 
     /// <inheritdoc/>
-    public double Weight => Radius * 2;
+    public double Mass => Radius * 2;
 
     /// <inheritdoc/>
-    public void Move(TimeSpan elapsed)
+    public async Task Move(CancellationToken cancellationToken)
     {
-        Position += Velocity * elapsed.TotalSeconds;
+        var timestamp = Stopwatch.GetTimestamp();
+        
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var elapsed = Stopwatch.GetElapsedTime(timestamp);
+            timestamp = Stopwatch.GetTimestamp();
+            
+            Position += Velocity * elapsed.TotalSeconds;
+            
+            await Task.Delay(TimeSpan.FromSeconds(1.0 / 60.0), cancellationToken);
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -64,7 +77,7 @@ public sealed class Ball : IBall
     /// <param name="field">Field reference</param>
     /// <param name="value">New value</param>
     /// <param name="propertyName">Property name</param>
-    /// <returns>True if change accually occured, false otherwise</returns>
+    /// <returns>True if change actually occured, false otherwise</returns>
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
