@@ -24,14 +24,26 @@
                          Text="{Binding BallsToAdd}"/>
             </DockPanel>
             
+            <DockPanel>
+                <Label VerticalContentAlignment="Center">Szerokość Stołu</Label>
+                <TextBox VerticalContentAlignment="Center"
+                         Text="{Binding Width}"/>
+            </DockPanel>
+            
+            <DockPanel>
+                <Label VerticalContentAlignment="Center">Wysokość Stołu</Label>
+                <TextBox VerticalContentAlignment="Center"
+                         Text="{Binding Height}"/>
+            </DockPanel>
+            
             <Button Command="{Binding AddBallsCommand}">Dodaj kulki</Button>
         </StackPanel>
         
         <Viewbox Grid.Column="1" Stretch="Uniform">
-            <Canvas Width="{Binding Bounds.Width}" Height="{Binding Bounds.Height}">
+            <Canvas Width="{Binding Width}" Height="{Binding Height}">
                 <Rectangle
-                    Width="{Binding Bounds.Width}"
-                    Height="{Binding Bounds.Height}"
+                    Width="{Binding Width}"
+                    Height="{Binding Height}"
                     Fill="LightGray"
                     Stroke="Black" >
                 </Rectangle>

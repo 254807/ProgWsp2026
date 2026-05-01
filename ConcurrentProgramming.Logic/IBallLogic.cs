@@ -20,7 +20,7 @@ public interface IBallLogic : INotifyPropertyChanged
     /// <summary>
     /// Gets or sets the bounds.
     /// </summary>
-    Rectangle Bounds { get; init; }
+    Rectangle Bounds { get; set; }
 
     /// <summary>
     /// Adds a ball.

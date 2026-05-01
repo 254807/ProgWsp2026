@@ -41,10 +41,34 @@ public sealed class MainViewModel : INotifyPropertyChanged
         set => SetField(ref field, value);
     } = 0;
 
-    public Rectangle Bounds
+    /// <summary>
+    /// Gets or sets the width of the table.
+    /// </summary>
+    public int Width
     {
         get;
-        private set => SetField(ref field, value);
+        set
+        {
+            if (SetField(ref field, value))
+            {
+                BallLogic.Bounds = BallLogic.Bounds with { Width = value };
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Gets or sets the height of the table.
+    /// </summary>
+    public int Height
+    {
+        get;
+        set
+        {
+            if (SetField(ref field, value))
+            {
+                BallLogic.Bounds = BallLogic.Bounds with { Height = value };
+            }
+        }
     }
 
     /// <summary>
@@ -53,8 +77,14 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public MainViewModel()
     {
         BallLogic = new BallLogic();
-        BallLogic.PropertyChanged += (_, _) => Bounds = BallLogic.Bounds;
-        Bounds = BallLogic.Bounds;
+        BallLogic.PropertyChanged += (_, _) =>
+        {
+            Width = BallLogic.Bounds.Width;
+            Height = BallLogic.Bounds.Height;
+        };
+        
+        Width = BallLogic.Bounds.Width;
+        Height = BallLogic.Bounds.Height;
 
         ((INotifyCollectionChanged)BallLogic.Balls).CollectionChanged += (_, e) =>
         {

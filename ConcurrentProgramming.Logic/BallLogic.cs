@@ -67,7 +67,7 @@ public sealed class BallLogic : IBallLogic
     public Rectangle Bounds
     {
         get;
-        init => SetField(ref field, value);
+        set => SetField(ref field, value);
     } = new(0, 0, 1920 / 6, 1080 / 6);
 
     /// <summary>
