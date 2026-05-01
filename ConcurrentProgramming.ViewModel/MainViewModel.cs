@@ -33,9 +33,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public ICommand AddBallsCommand { get; }
 
     /// <summary>
-    /// Gets or sets the balls to be added when <see cref="ExecuteAddBallsCommand"/> is called.
+    /// Gets or sets the target amount of balls to run the simulation with when <see cref="ExecuteAddBallsCommand"/> is called.
     /// </summary>
-    public int BallsToAdd
+    public int TargetBallCount
     {
         get;
         set => SetField(ref field, value);
@@ -88,15 +88,18 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
         ((INotifyCollectionChanged)BallLogic.Balls).CollectionChanged += (_, e) =>
         {
-            if (e.Action != NotifyCollectionChangedAction.Add) return;
-
             foreach (var newItem in e.NewItems?.OfType<IBall>() ?? [])
             {
                 Balls.Add(new BallModel(newItem));
             }
+            
+            foreach (var oldItem in e.OldItems?.OfType<IBall>() ?? [])
+            {
+                Balls.Remove(Balls.First(b => b.DataBall == oldItem));
+            }
         };  
 
-        AddBallsCommand = new DelegateCommand(ExecuteAddBallsCommand, _ => BallLogic.Balls.Count == 0);
+        AddBallsCommand = new DelegateCommand(ExecuteAddBallsCommand, _ => TargetBallCount >= 0);
     }
 
     /// <summary>
@@ -104,16 +107,15 @@ public sealed class MainViewModel : INotifyPropertyChanged
     /// </summary>
     private void ExecuteAddBallsCommand(object? _)
     {
-        AddBalls(BallsToAdd);
-    }
-
-    /// <summary>
-    /// Adds given number of balls.
-    /// </summary>
-    /// <param name="count">Ammount of balls to be added</param>
-    public void AddBalls(int count)
-    {
-        BallLogic.AddBalls(count);
+        var diff = TargetBallCount - BallLogic.Balls.Count;
+        if (diff > 0)
+        {
+            BallLogic.AddBalls(diff);
+        }
+        else
+        {
+            BallLogic.RemoveBalls(-diff);
+        }
     }
 
     /// <inheritdoc />

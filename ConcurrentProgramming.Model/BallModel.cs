@@ -10,21 +10,19 @@ namespace ConcurrentProgramming.Model;
 /// </summary>
 public sealed class BallModel : INotifyPropertyChanged
 {
-    private readonly IBall _ball;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="BallModel"/> class.
     /// </summary>
     /// <param name="ball">The Iball instance</param>
     public BallModel(IBall ball)
     {
-        _ball = ball;
+        DataBall = ball;
 
         ball.PropertyChanged += (sender, e) =>
         {
             switch (e.PropertyName)
             {
-                case nameof(_ball.Position):
+                case nameof(DataBall.Position):
                     BallChanged();
                     break;
 
@@ -33,6 +31,8 @@ public sealed class BallModel : INotifyPropertyChanged
 
         BallChanged();
     }
+    
+    public IBall DataBall { get; }
 
     /// <summary>
     /// Gets or sets the distance from the window's left border.
@@ -69,9 +69,9 @@ public sealed class BallModel : INotifyPropertyChanged
     /// </summary>
     private void BallChanged()
     {
-        Left = _ball.Position.X - _ball.Radius;
-        Top = _ball.Position.Y - _ball.Radius;
-        Diameter = _ball.Radius * 2;
+        Left = DataBall.Position.X - DataBall.Radius;
+        Top = DataBall.Position.Y - DataBall.Radius;
+        Diameter = DataBall.Radius * 2;
     }
 
     /// <summary>

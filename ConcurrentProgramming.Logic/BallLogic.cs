@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -32,35 +33,46 @@ public sealed class BallLogic : IBallLogic
     /// <inheritdoc />
     public ReadOnlyObservableCollection<IBall> Balls { get; }
 
-    /// <summary>
-    /// Adds a ball.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    public void AddBall(CancellationToken cancellationToken)
+    private readonly Dictionary<IBall, CancellationTokenSource> _ballCancellationTokens = [];
+    
+    /// <inheritdoc />
+    public void AddBall()
     {
+        var cancellationTokenSource = new CancellationTokenSource();
         var ball = CreateBall();
         lock (_lock)
         {
+            _ballCancellationTokens[ball] = cancellationTokenSource;
             _balls.Add(ball);
         }
         ball.PropertyChanged += BallOnPropertyChanged;
-        _ = Task.Run(() => ball.Move(cancellationToken), cancellationToken);
+        _ = Task.Run(() => ball.Move(cancellationTokenSource.Token), cancellationTokenSource.Token);
     }
     
     /// <inheritdoc />
-    public IReadOnlyList<CancellationTokenSource> AddBalls(int ballCount)
+    public void AddBalls(int ballCount)
     {
-        List<CancellationTokenSource> tokenSources = [];
-        
         for (var i = 0; i < ballCount; i++)
         {
-            CancellationTokenSource source = new();
-            
-            tokenSources.Add(source);
-            AddBall(source.Token);
+            AddBall();
         }
+    }
 
-        return tokenSources;
+    /// <inheritdoc />
+    public void RemoveBalls(int ballCount)
+    {
+        lock (_lock)
+        {
+            for (var i = 0; i < ballCount; i++)
+            {
+                var last = _balls[^1];
+                if (_ballCancellationTokens.Remove(last, out var cancellationTokenSource))
+                {  
+                    cancellationTokenSource.Cancel();
+                }
+                _balls.RemoveAt(_balls.Count - 1);
+            }
+        }
     }
 
     /// <inheritdoc />

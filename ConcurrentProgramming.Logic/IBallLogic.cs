@@ -25,12 +25,17 @@ public interface IBallLogic : INotifyPropertyChanged
     /// <summary>
     /// Adds a ball.
     /// </summary>
-    /// <param name="cancellationToken">Token which cancels the movement of the new ball.</param>
-    void AddBall(CancellationToken cancellationToken);
+    void AddBall();
     
     /// <summary>
     /// Adds given number of balls.
     /// </summary>
     /// <param name="ballCount">The ball count.</param>
-    IReadOnlyList<CancellationTokenSource> AddBalls(int ballCount);
+    void AddBalls(int ballCount);
+
+    /// <summary>
+    /// Removes the given number of balls.
+    /// </summary>
+    /// <param name="ballCount">The ball count.</param>
+    void RemoveBalls(int ballCount);
 }

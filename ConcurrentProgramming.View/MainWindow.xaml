@@ -21,7 +21,7 @@
             <DockPanel>
                 <Label VerticalContentAlignment="Center">Ilość kulek</Label>
                 <TextBox VerticalContentAlignment="Center"
-                         Text="{Binding BallsToAdd}"/>
+                         Text="{Binding TargetBallCount}"/>
             </DockPanel>
             
             <DockPanel>
