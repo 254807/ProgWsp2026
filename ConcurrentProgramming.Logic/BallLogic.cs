@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using ConcurrentProgramming.Data;
-using Vector = ConcurrentProgramming.Data.Vector;
 
 namespace ConcurrentProgramming.Logic;
 
@@ -32,6 +31,10 @@ public sealed class BallLogic : IBallLogic
     /// <inheritdoc />
     public ReadOnlyObservableCollection<IBall> Balls { get; }
 
+    /// <summary>
+    /// Adds a ball.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public void AddBall(CancellationToken cancellationToken)
     {
         var ball = CreateBall();
@@ -64,10 +67,18 @@ public sealed class BallLogic : IBallLogic
     } = new(0, 0, 1920 / 6, 1080 / 6);
 
     private IBall? _currentlyCheckedBall;
-    
+
+    /// <summary>
+    /// Handles the PropertyChanged event of a ball.
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The event.</param>
     private void BallOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (sender is not IBall ball || e.PropertyName != nameof(IBall.Position)) return;
+        if (sender is not IBall ball || e.PropertyName != nameof(IBall.Position)) 
+        { 
+            return;
+        }
         
         var newPosition = ball.Position;
         if (newPosition.Y + ball.Radius > Bounds.Bottom)
@@ -99,37 +110,41 @@ public sealed class BallLogic : IBallLogic
             // Hackfix to avoid infinite recursion when setting the position after colliding
             // TODO: find a better way to do this
             if (_currentlyCheckedBall == ball)
+            {
                 return;
+            }
             _currentlyCheckedBall = ball;
-            
+
             foreach (var otherBall in Balls)
             {
-                if (otherBall == ball)
+                if (otherBall == ball || Vector.Distance(ball.Position, otherBall.Position) >= ball.Radius + otherBall.Radius)
+                {
                     continue;
-                
-                var position = ball.Position;
-                var otherPosition = otherBall.Position;
-                
-                var dist = Vector.Distance(position, otherPosition);
-                if (dist >= ball.Radius + otherBall.Radius)
-                    continue;
+                }
 
                 // First, move the ball to the exact collision point, to avoid balls getting stuck inside each other
-                ball.Position = otherPosition - (otherPosition - position).Normalized() * (ball.Radius + otherBall.Radius);
-                //otherBall.Position = position - (position - otherPosition).Normalized() * (ball.Radius + otherBall.Radius);
+                ball.Position = otherBall.Position - (otherBall.Position - ball.Position).Normalized() * (ball.Radius + otherBall.Radius);
 
-                (ball.Velocity, otherBall.Velocity) = (ElasticCollision(ball, otherBall), ElasticCollision(otherBall, ball));
+                ball.Velocity = ElasticCollision(ball, otherBall);
+                otherBall.Velocity = ElasticCollision(otherBall, ball);
             }
         }
     }
 
+    /// <summary>
+    /// Elastics the collision.
+    /// </summary>
+    /// <param name="ball">The ball.</param>
+    /// <param name="otherBall">The other ball.</param>
+    /// <returns>A Vector.</returns>
     private static Vector ElasticCollision(IBall ball, IBall otherBall)
     {
         // https://en.wikipedia.org/wiki/Elastic_collision
         // "In an angle-free representation, the changed velocities are computed using the centers x1 and x2 at the time of contact as:"
         return ball.Velocity - (ball.Position - otherBall.Position)
             * (2 * otherBall.Mass / (ball.Mass + otherBall.Mass))
-            * (Vector.Dot(ball.Velocity - otherBall.Velocity, ball.Position - otherBall.Position) / Vector.DistanceSquared(ball.Position, otherBall.Position));
+            * (Vector.Dot(ball.Velocity - otherBall.Velocity, ball.Position - otherBall.Position)
+            / Vector.DistanceSquared(ball.Position, otherBall.Position));
     }
 
     /// <summary>
