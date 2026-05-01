@@ -42,7 +42,7 @@ public sealed class Ball : IBall
     public double Radius => 5;
 
     /// <inheritdoc/>
-    public double Mass => Radius * 2;
+    public double Mass => Radius * Radius * 0.2;
 
     /// <inheritdoc/>
     public async Task Move(CancellationToken cancellationToken)

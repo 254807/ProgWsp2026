@@ -66,20 +66,18 @@ public sealed class BallLogic : IBallLogic
         init => SetField(ref field, value);
     } = new(0, 0, 1920 / 6, 1080 / 6);
 
-    private IBall? _currentlyCheckedBall;
-
     /// <summary>
-    /// Handles the PropertyChanged event of a ball.
+    /// Handles the PropertyChanged event of a ball and performs collision and bounds checks.
     /// </summary>
-    /// <param name="sender">The sender.</param>
-    /// <param name="e">The event.</param>
+    /// <param name="sender">The sender (expected to be an <see cref="IBall"/>).</param>
+    /// <param name="e">Property changed event args.</param>
     private void BallOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is not IBall ball || e.PropertyName != nameof(IBall.Position)) 
         { 
             return;
         }
-        
+
         var newPosition = ball.Position;
         if (newPosition.Y + ball.Radius > Bounds.Bottom)
         {
@@ -109,27 +107,29 @@ public sealed class BallLogic : IBallLogic
         {
             foreach (var otherBall in Balls)
             {
-                if (ball == otherBall) 
-                { 
-                    continue; 
+                if (ball == otherBall)
+                {
+                    continue;
                 }
 
                 var delta = otherBall.Position - ball.Position;
 
-                if (delta.Length() < ball.Radius + otherBall.Radius)
+                if (delta.Length() >= ball.Radius + otherBall.Radius)
                 {
-                    var normal = delta.Normalized();
-                    var speed = Vector.Dot(ball.Velocity - otherBall.Velocity, normal);
-
-                    if (speed < 0)
-                    {
-                        continue;
-                    }
-
-                    var impulse = normal * 2 * (speed / (ball.Mass + otherBall.Mass));
-                    ball.Velocity -= impulse * otherBall.Mass;
-                    otherBall.Velocity += impulse * ball.Mass;
+                    continue;
                 }
+
+                var normal = delta.Normalized();
+                var speed = Vector.Dot(ball.Velocity - otherBall.Velocity, normal);
+
+                if (speed < 0)
+                {
+                    continue;
+                }
+
+                var impulse = normal * (2 * speed / (ball.Mass + otherBall.Mass));
+                ball.Velocity -= impulse * otherBall.Mass;
+                otherBall.Velocity += impulse * ball.Mass;
             }
         }
     }
@@ -157,13 +157,28 @@ public sealed class BallLogic : IBallLogic
         return ball;
     }
 
+    /// <summary>
+    /// Event raised when a property on this instance changes.
+    /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Raises the <see cref="PropertyChanged"/> event.
+    /// </summary>
+    /// <param name="propertyName">Name of the property that changed.</param>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    /// <summary>
+    /// Sets a backing field and raises PropertyChanged when the value changes.
+    /// </summary>
+    /// <typeparam name="T">Field type.</typeparam>
+    /// <param name="field">Reference to the field to set.</param>
+    /// <param name="value">New value.</param>
+    /// <param name="propertyName">Name of the property (automatically provided).</param>
+    /// <returns>True if the field was changed; otherwise false.</returns>
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
