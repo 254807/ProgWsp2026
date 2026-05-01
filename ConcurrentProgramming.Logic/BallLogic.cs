@@ -107,44 +107,31 @@ public sealed class BallLogic : IBallLogic
 
         lock (_lock)
         {
-            // Hackfix to avoid infinite recursion when setting the position after colliding
-            // TODO: find a better way to do this
-            if (_currentlyCheckedBall == ball)
-            {
-                return;
-            }
-            _currentlyCheckedBall = ball;
-
             foreach (var otherBall in Balls)
             {
-                if (otherBall == ball || Vector.Distance(ball.Position, otherBall.Position) >= ball.Radius + otherBall.Radius)
-                {
-                    continue;
+                if (ball == otherBall) 
+                { 
+                    continue; 
                 }
 
-                // First, move the ball to the exact collision point, to avoid balls getting stuck inside each other
-                ball.Position = otherBall.Position - (otherBall.Position - ball.Position).Normalized() * (ball.Radius + otherBall.Radius);
+                var delta = otherBall.Position - ball.Position;
 
-                ball.Velocity = ElasticCollision(ball, otherBall);
-                otherBall.Velocity = ElasticCollision(otherBall, ball);
+                if (delta.Length() < ball.Radius + otherBall.Radius)
+                {
+                    var normal = delta.Normalized();
+                    var speed = Vector.Dot(ball.Velocity - otherBall.Velocity, normal);
+
+                    if (speed < 0)
+                    {
+                        continue;
+                    }
+
+                    var impulse = normal * 2 * (speed / (ball.Mass + otherBall.Mass));
+                    ball.Velocity -= impulse * otherBall.Mass;
+                    otherBall.Velocity += impulse * ball.Mass;
+                }
             }
         }
-    }
-
-    /// <summary>
-    /// Elastics the collision.
-    /// </summary>
-    /// <param name="ball">The ball.</param>
-    /// <param name="otherBall">The other ball.</param>
-    /// <returns>A Vector.</returns>
-    private static Vector ElasticCollision(IBall ball, IBall otherBall)
-    {
-        // https://en.wikipedia.org/wiki/Elastic_collision
-        // "In an angle-free representation, the changed velocities are computed using the centers x1 and x2 at the time of contact as:"
-        return ball.Velocity - (ball.Position - otherBall.Position)
-            * (2 * otherBall.Mass / (ball.Mass + otherBall.Mass))
-            * (Vector.Dot(ball.Velocity - otherBall.Velocity, ball.Position - otherBall.Position)
-            / Vector.DistanceSquared(ball.Position, otherBall.Position));
     }
 
     /// <summary>
