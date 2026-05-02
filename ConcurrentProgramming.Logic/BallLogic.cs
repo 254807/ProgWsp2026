@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -40,15 +39,17 @@ public sealed class BallLogic : IBallLogic
     {
         var cancellationTokenSource = new CancellationTokenSource();
         var ball = CreateBall();
+
         lock (_lock)
         {
             _ballCancellationTokens[ball] = cancellationTokenSource;
             _balls.Add(ball);
         }
+
         ball.PropertyChanged += BallOnPropertyChanged;
         _ = Task.Run(() => ball.Move(cancellationTokenSource.Token), cancellationTokenSource.Token);
     }
-    
+
     /// <inheritdoc />
     public void AddBalls(int ballCount)
     {

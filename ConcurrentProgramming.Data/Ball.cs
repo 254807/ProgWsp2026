@@ -48,7 +48,7 @@ public sealed class Ball : IBall
     public async Task Move(CancellationToken cancellationToken)
     {
         var timestamp = Stopwatch.GetTimestamp();
-        
+
         while (!cancellationToken.IsCancellationRequested)
         {
             var elapsed = Stopwatch.GetElapsedTime(timestamp);

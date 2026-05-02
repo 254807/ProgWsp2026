@@ -4,7 +4,6 @@ using ConcurrentProgramming.Logic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
