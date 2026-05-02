@@ -31,7 +31,10 @@ public sealed class BallModel : INotifyPropertyChanged
 
         BallChanged();
     }
-    
+
+    /// <summary>
+    /// Gets the data ball.
+    /// </summary>
     public IBall DataBall { get; }
 
     /// <summary>
