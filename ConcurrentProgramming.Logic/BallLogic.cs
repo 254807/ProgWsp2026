@@ -95,33 +95,33 @@ public sealed class BallLogic : IBallLogic
             return;
         }
 
-        var newPosition = ball.Position;
-        if (newPosition.Y + ball.Radius > Bounds.Bottom)
-        {
-            ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
-            ball.Position = ball.Position with { Y = Bounds.Bottom - ball.Radius };
-        }
-        else if (newPosition.Y - ball.Radius < Bounds.Top)
-        {
-            ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
-            ball.Position = ball.Position with { Y = Bounds.Top + ball.Radius };
-        }
-        
-        if (newPosition.X + ball.Radius > Bounds.Right)
-        {
-            ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
-            ball.Position = ball.Position with { X = Bounds.Right - ball.Radius };
-        }
-        
-        // ReSharper disable once InvertIf
-        else if (newPosition.X - ball.Radius < Bounds.Left)
-        {
-            ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
-            ball.Position = ball.Position with { X = Bounds.Left + ball.Radius };
-        }
-
         lock (_lock)
         {
+            var newPosition = ball.Position;
+            if (newPosition.Y + ball.Radius > Bounds.Bottom)
+            {
+                ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
+                ball.Position = ball.Position with { Y = Bounds.Bottom - ball.Radius };
+            }
+            else if (newPosition.Y - ball.Radius < Bounds.Top)
+            {
+                ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
+                ball.Position = ball.Position with { Y = Bounds.Top + ball.Radius };
+            }
+        
+            if (newPosition.X + ball.Radius > Bounds.Right)
+            {
+                ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
+                ball.Position = ball.Position with { X = Bounds.Right - ball.Radius };
+            }
+        
+            // ReSharper disable once InvertIf
+            else if (newPosition.X - ball.Radius < Bounds.Left)
+            {
+                ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
+                ball.Position = ball.Position with { X = Bounds.Left + ball.Radius };
+            }
+
             foreach (var otherBall in Balls)
             {
                 if (ball == otherBall)
