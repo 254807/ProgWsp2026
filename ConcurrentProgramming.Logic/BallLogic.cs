@@ -93,13 +93,7 @@ public sealed class BallLogic : IBallLogic
                 return field;
             }
         }
-        set
-        {
-            lock (_lock)
-            {
-                SetField(ref field, value);
-            }
-        }
+        set => SetField(ref field, value);
     } = new(0, 0, 1920 / 6, 1080 / 6);
 
     /// <summary>
@@ -217,8 +211,15 @@ public sealed class BallLogic : IBallLogic
     /// <returns>True if the field was changed; otherwise false.</returns>
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
+        lock (_lock)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+            {
+                return false;
+            }
+            field = value;
+        }
+
         OnPropertyChanged(propertyName);
         return true;
     }
