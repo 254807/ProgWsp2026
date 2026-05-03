@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
 	<LangVersion>14</LangVersion>
     <UseWPF>true</UseWPF>
+	<EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
   <ItemGroup>
