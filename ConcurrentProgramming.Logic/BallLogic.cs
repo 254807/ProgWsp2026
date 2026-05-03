@@ -170,7 +170,7 @@ public sealed class BallLogic : IBallLogic
     /// <returns>A newly created Ball</returns>
     private Ball CreateBall()
     {
-        var velocity = new Vector(_random.NextDouble() - 0.5, _random.NextDouble() -0.5) * 90;
+        var velocity = new Vector(_random.NextDouble() - 0.5, _random.NextDouble() - 0.5) * 200;
         velocity.X += double.Sign(velocity.X);
         velocity.Y += double.Sign(velocity.Y);
         
