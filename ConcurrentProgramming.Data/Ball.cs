@@ -13,6 +13,8 @@ namespace ConcurrentProgramming.Data;
 /// </summary>
 public sealed class Ball : IBall
 {
+    private readonly Lock _lock = new(); // Lock object for thread safety
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Ball"/> class.
     /// </summary>
@@ -27,15 +29,39 @@ public sealed class Ball : IBall
     /// <inheritdoc/>
     public Vector Position
     {
-        get;
-        set => SetField(ref field, value);
+        get
+        {
+            lock (_lock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (_lock)
+            {
+                SetField(ref field, value);
+            }
+        }
     }
 
     /// <inheritdoc/>
     public Vector Velocity
     {
-        get;
-        set => SetField(ref field, value);
+        get
+        {
+            lock (_lock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (_lock)
+            {
+                SetField(ref field, value);
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -53,9 +79,12 @@ public sealed class Ball : IBall
         {
             var elapsed = Stopwatch.GetElapsedTime(timestamp);
             timestamp = Stopwatch.GetTimestamp();
-            
-            Position += Velocity * elapsed.TotalSeconds;
-            
+
+            lock (_lock)
+            {
+                Position += Velocity * elapsed.TotalSeconds;
+            }
+
             await Task.Delay(TimeSpan.FromSeconds(1.0 / 60.0), cancellationToken);
         }
     }

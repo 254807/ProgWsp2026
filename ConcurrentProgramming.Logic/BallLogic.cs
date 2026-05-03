@@ -33,7 +33,7 @@ public sealed class BallLogic : IBallLogic
     public ReadOnlyObservableCollection<IBall> Balls { get; }
 
     private readonly Dictionary<IBall, CancellationTokenSource> _ballCancellationTokens = [];
-    
+
     /// <inheritdoc />
     public void AddBall()
     {
@@ -64,13 +64,20 @@ public sealed class BallLogic : IBallLogic
     {
         lock (_lock)
         {
+            if (_balls.Count == 0)
+            {
+                return;
+            }
+
             for (var i = 0; i < ballCount; i++)
             {
                 var last = _balls[^1];
+
                 if (_ballCancellationTokens.Remove(last, out var cancellationTokenSource))
                 {  
                     cancellationTokenSource.Cancel();
                 }
+
                 _balls.RemoveAt(_balls.Count - 1);
             }
         }
@@ -79,8 +86,20 @@ public sealed class BallLogic : IBallLogic
     /// <inheritdoc />
     public Rectangle Bounds
     {
-        get;
-        set => SetField(ref field, value);
+        get
+        {
+            lock (_lock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (_lock)
+            {
+                SetField(ref field, value);
+            }
+        }
     } = new(0, 0, 1920 / 6, 1080 / 6);
 
     /// <summary>
