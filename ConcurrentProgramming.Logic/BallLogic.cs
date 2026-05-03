@@ -67,10 +67,12 @@ public sealed class BallLogic : IBallLogic
             for (var i = 0; i < ballCount; i++)
             {
                 var last = _balls[^1];
+
                 if (_ballCancellationTokens.Remove(last, out var cancellationTokenSource))
                 {  
                     cancellationTokenSource.Cancel();
                 }
+
                 _balls.RemoveAt(_balls.Count - 1);
             }
         }

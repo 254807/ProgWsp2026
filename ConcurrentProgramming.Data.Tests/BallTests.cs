@@ -13,7 +13,7 @@ public class BallTests
     /// Tests the position.
     /// </summary>
     [Fact]
-    public void TestPosition()
+    async public Task TestPosition()
     {
         Assert.Equal(new Vector(0, 0), ball.Position);
 
@@ -26,7 +26,7 @@ public class BallTests
     /// Tests the velocity.
     /// </summary>
     [Fact]
-    public void TestVelocity()
+    async public Task TestVelocity()
     {
         Assert.Equal(new Vector(0, 0), ball.Velocity);
 
@@ -36,19 +36,20 @@ public class BallTests
     }
 
     /// <summary>
-    /// Tests the radius.
+    /// Tests the constants.
     /// </summary>
     [Fact]
-    public void TestRadius()
+    async public Task TestConsts()
     {
         Assert.Equal(5, ball.Radius);
+        Assert.Equal(5, ball.Mass);
     }
 
     /// <summary>
     /// Tests the property changed event.
     /// </summary>
     [Fact]
-    public void TestPropertyChangedEvent()
+    async public Task TestPropertyChangedEvent()
     {
         var ball = new Ball(new Vector(1, 1), new Vector(1, 1));
         var fired = false;
