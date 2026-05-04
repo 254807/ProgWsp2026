@@ -33,7 +33,7 @@ public sealed class BallLogic : IBallLogic
     public ReadOnlyObservableCollection<IBall> Balls { get; }
 
     private readonly Dictionary<IBall, CancellationTokenSource> _ballCancellationTokens = [];
-    
+
     /// <inheritdoc />
     public void AddBall()
     {
@@ -64,6 +64,11 @@ public sealed class BallLogic : IBallLogic
     {
         lock (_lock)
         {
+            if (_balls.Count == 0)
+            {
+                return;
+            }
+
             for (var i = 0; i < ballCount; i++)
             {
                 var last = _balls[^1];
@@ -81,7 +86,13 @@ public sealed class BallLogic : IBallLogic
     /// <inheritdoc />
     public Rectangle Bounds
     {
-        get;
+        get
+        {
+            lock (_lock)
+            {
+                return field;
+            }
+        }
         set => SetField(ref field, value);
     } = new(0, 0, 1920 / 6, 1080 / 6);
 
@@ -97,33 +108,33 @@ public sealed class BallLogic : IBallLogic
             return;
         }
 
-        var newPosition = ball.Position;
-        if (newPosition.Y + ball.Radius > Bounds.Bottom)
-        {
-            ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
-            ball.Position = ball.Position with { Y = Bounds.Bottom - ball.Radius };
-        }
-        else if (newPosition.Y - ball.Radius < Bounds.Top)
-        {
-            ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
-            ball.Position = ball.Position with { Y = Bounds.Top + ball.Radius };
-        }
-        
-        if (newPosition.X + ball.Radius > Bounds.Right)
-        {
-            ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
-            ball.Position = ball.Position with { X = Bounds.Right - ball.Radius };
-        }
-        
-        // ReSharper disable once InvertIf
-        else if (newPosition.X - ball.Radius < Bounds.Left)
-        {
-            ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
-            ball.Position = ball.Position with { X = Bounds.Left + ball.Radius };
-        }
-
         lock (_lock)
         {
+            var newPosition = ball.Position;
+            if (newPosition.Y + ball.Radius > Bounds.Bottom)
+            {
+                ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
+                ball.Position = ball.Position with { Y = Bounds.Bottom - ball.Radius };
+            }
+            else if (newPosition.Y - ball.Radius < Bounds.Top)
+            {
+                ball.Velocity = ball.Velocity with { Y = -ball.Velocity.Y };
+                ball.Position = ball.Position with { Y = Bounds.Top + ball.Radius };
+            }
+        
+            if (newPosition.X + ball.Radius > Bounds.Right)
+            {
+                ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
+                ball.Position = ball.Position with { X = Bounds.Right - ball.Radius };
+            }
+        
+            // ReSharper disable once InvertIf
+            else if (newPosition.X - ball.Radius < Bounds.Left)
+            {
+                ball.Velocity = ball.Velocity with { X = -ball.Velocity.X };
+                ball.Position = ball.Position with { X = Bounds.Left + ball.Radius };
+            }
+
             foreach (var otherBall in Balls)
             {
                 if (ball == otherBall)
@@ -200,8 +211,15 @@ public sealed class BallLogic : IBallLogic
     /// <returns>True if the field was changed; otherwise false.</returns>
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
+        lock (_lock)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+            {
+                return false;
+            }
+            field = value;
+        }
+
         OnPropertyChanged(propertyName);
         return true;
     }

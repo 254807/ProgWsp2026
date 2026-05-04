@@ -13,6 +13,8 @@ namespace ConcurrentProgramming.Data;
 /// </summary>
 public sealed class Ball : IBall
 {
+    private readonly Lock _lock = new(); // Lock object for thread safety
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Ball"/> class.
     /// </summary>
@@ -24,17 +26,31 @@ public sealed class Ball : IBall
         Velocity = velocity;
     }
 
+    private Vector _position;
+    
     /// <inheritdoc/>
     public Vector Position
     {
-        get;
-        set => SetField(ref field, value);
+        get
+        {
+            lock (_lock)
+            {
+                return _position;
+            }
+        }
+        set => SetField(ref _position, value);
     }
 
     /// <inheritdoc/>
     public Vector Velocity
     {
-        get;
+        get
+        {
+            lock (_lock)
+            {
+                return field;
+            }
+        }
         set => SetField(ref field, value);
     }
 
@@ -53,9 +69,16 @@ public sealed class Ball : IBall
         {
             var elapsed = Stopwatch.GetElapsedTime(timestamp);
             timestamp = Stopwatch.GetTimestamp();
-            
-            Position += Velocity * elapsed.TotalSeconds;
-            
+
+            // We want to increment Position by Velocity atomically,
+            // but don't want to trigger the PropertyChanged event inside the lock to prevent deadlocks,
+            // so we'll have to write to the backing field and fire the event manually here.
+            lock (_lock)
+            {
+                _position += Velocity * elapsed.TotalSeconds;
+            }
+            FirePropertyChanged(nameof(Position));
+
             await Task.Delay(TimeSpan.FromSeconds(1.0 / 60.0), cancellationToken);
         }
     }
@@ -80,8 +103,15 @@ public sealed class Ball : IBall
     /// <returns>True if change actually occured, false otherwise</returns>
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
+        lock (_lock)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+            {
+                return false;
+            }
+            field = value;
+        }
+
         FirePropertyChanged(propertyName);
         return true;
     }
