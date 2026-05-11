@@ -6,6 +6,8 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using ConcurrentProgramming.Model;
 
@@ -75,7 +77,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
     /// </summary>
     public MainViewModel()
     {
-        BallLogic = new BallLogic();
+        var logger = new BackgroundFileLogger("log.txt");
+        Task.Run(() => logger.LoggingThread(CancellationToken.None));
+        BallLogic = new BallLogic(logger);
         BallLogic.PropertyChanged += (_, _) =>
         {
             Width = BallLogic.Bounds.Width;

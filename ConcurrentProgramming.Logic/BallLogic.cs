@@ -15,6 +15,7 @@ namespace ConcurrentProgramming.Logic;
 /// </summary>
 public sealed class BallLogic : IBallLogic
 {
+    private readonly ILogger _logger;
     private readonly ObservableCollection<IBall> _balls = [];
 
     private readonly Random _random = new();
@@ -24,8 +25,9 @@ public sealed class BallLogic : IBallLogic
     /// <summary>
     /// Initializes a new instance of the <see cref="BallLogic"/> class.
     /// </summary>
-    public BallLogic()
+    public BallLogic(ILogger logger)
     {
+        _logger = logger;
         Balls = new ReadOnlyObservableCollection<IBall>(_balls);
     }
 
@@ -96,6 +98,8 @@ public sealed class BallLogic : IBallLogic
         set => SetField(ref field, value);
     } = new(0, 0, 1920 / 6, 1080 / 6);
 
+    private record BallCollision(Vector Impulse);
+    
     /// <summary>
     /// Handles the PropertyChanged event of a ball and performs collision and bounds checks.
     /// </summary>
@@ -160,6 +164,8 @@ public sealed class BallLogic : IBallLogic
                 var impulse = normal * (2 * speed / (ball.Mass + otherBall.Mass));
                 ball.Velocity -= impulse * otherBall.Mass;
                 otherBall.Velocity += impulse * ball.Mass;
+                
+                _logger.Log(new BallCollision(impulse));
             }
         }
     }
