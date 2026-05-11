@@ -13,7 +13,7 @@ namespace ConcurrentProgramming.Logic;
 /// <param name="filePath">The path to the file to write to.</param>
 public sealed class BackgroundFileLogger(string filePath) : ILogger
 {
-    private readonly BlockingCollection<object> _queue = [];
+    private readonly BlockingCollection<(object Message, DateTime Time)> _queue = [];
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new();
     
@@ -35,19 +35,18 @@ public sealed class BackgroundFileLogger(string filePath) : ILogger
         
         while (!token.IsCancellationRequested)
         {
-            var message = _queue.Take(token);
-            
             try
             {
-                await using var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-                await using var textWriter = new StreamWriter(fileStream);
-                fileStream.Seek(0, SeekOrigin.End);
-
+                var (message, time) = _queue.Take(token);
                 var json = JsonSerializer.Serialize(message, _jsonSerializerOptions);
 
-                await textWriter.WriteLineAsync($"[{message.GetType()}] {json}");
+                await File.AppendAllTextAsync(filePath, $"[{time}] [{message.GetType().Name}] {json}\n", token);
             }
-            catch (IOException ex)
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"Failed to append to log file: {filePath}: {ex}");
             }
@@ -59,6 +58,6 @@ public sealed class BackgroundFileLogger(string filePath) : ILogger
         if (message is null)
             return;
         
-        _queue.Add(message);
+        _queue.Add((message, DateTime.Now));
     }
 }
