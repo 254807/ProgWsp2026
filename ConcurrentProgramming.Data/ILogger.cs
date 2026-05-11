@@ -1,4 +1,4 @@
-namespace ConcurrentProgramming.Logic;
+namespace ConcurrentProgramming.Data;
 
 /// <summary>
 /// Allows for logging messages.

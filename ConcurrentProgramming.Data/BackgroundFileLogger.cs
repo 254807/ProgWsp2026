@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConcurrentProgramming.Logic;
+namespace ConcurrentProgramming.Data;
 
 /// <summary>
 /// A logger which writes to a file in a background thread.

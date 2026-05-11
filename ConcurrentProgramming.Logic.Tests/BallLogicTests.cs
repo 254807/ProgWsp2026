@@ -1,4 +1,6 @@
-﻿namespace ConcurrentProgramming.Logic.Tests;
+﻿using ConcurrentProgramming.Data;
+
+namespace ConcurrentProgramming.Logic.Tests;
 
 /// <summary>
 /// The ball logic tests.
