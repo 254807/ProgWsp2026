@@ -26,8 +26,6 @@ public sealed class Ball : IBall
         Velocity = velocity;
     }
 
-    private Vector _position;
-    
     /// <inheritdoc/>
     public Vector Position
     {
@@ -35,10 +33,10 @@ public sealed class Ball : IBall
         {
             lock (_lock)
             {
-                return _position;
+                return field;
             }
         }
-        set => SetField(ref _position, value);
+        set => SetField(ref field, value);
     }
 
     /// <inheritdoc/>
@@ -70,13 +68,7 @@ public sealed class Ball : IBall
             var elapsed = Stopwatch.GetElapsedTime(timestamp);
             timestamp = Stopwatch.GetTimestamp();
 
-            // We want to increment Position by Velocity atomically,
-            // but don't want to trigger the PropertyChanged event inside the lock to prevent deadlocks,
-            // so we'll have to write to the backing field and fire the event manually here.
-            lock (_lock)
-            {
-                _position += Velocity * elapsed.TotalSeconds;
-            }
+            Position += Velocity * elapsed.TotalSeconds;
             FirePropertyChanged(nameof(Position));
 
             await Task.Delay(TimeSpan.FromSeconds(1.0 / 60.0), cancellationToken);
